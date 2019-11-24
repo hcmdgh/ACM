@@ -2,11 +2,11 @@
 #include <vector>
 #include <string>
 using namespace std;
-#include "t57.h"
+#include "t63.h"
 
 int main() {
     Solution solution;
-//    solution.test();
+    solution.test();
 
     return 0;
 }
