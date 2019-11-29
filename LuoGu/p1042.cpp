@@ -1,36 +1,43 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
-void play(const string& records, int rounds) {
-	if (records.length() == 0) {
-		cout << "0:0" << endl;
-		return;
-	}
-	int win_count = 0, lose_count = 0;
-	for (char record : records) {
-		if (record == 'W')
-			++win_count;
-		else
-			++lose_count;
-		if ((win_count >= rounds || lose_count >= rounds) && abs(win_count - lose_count) >= 2) {
-			cout << win_count << ":" << lose_count << endl;
-			win_count = lose_count = 0;
-		}
-	}
-	cout << win_count << ":" << lose_count << endl;
-}
+char records[62505];
 
 int main() {
-	string records;
-	char ch;
-	while ((cin >> ch) && ch != 'E') {
-		records += ch;
-	}
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
+    int cnt = 0;
+    char ch;
+    while ((ch = getchar()) != 'E') {
+        if (ch == 'W' || ch == 'L')
+            records[cnt++] = ch;
+    }
+    int win = 0, lose = 0;
+    for (int i = 0; i < cnt; ++i) {
+        if (records[i] == 'W')
+            ++win;
+        else
+            ++lose;
+        if ((win >= 11 || lose >= 11) && abs(win - lose) >= 2) {
+            printf("%d:%d\n", win, lose);
+            win = lose = 0;
+        }
+    }
+    printf("%d:%d\n\n", win, lose);
 
-	play(records, 11);
-	cout << endl;
-	play(records, 21);
+    win = 0, lose = 0;
+    for (int i = 0; i < cnt; ++i) {
+        if (records[i] == 'W')
+            ++win;
+        else
+            ++lose;
+        if ((win >= 21 || lose >= 21) && abs(win - lose) >= 2) {
+            printf("%d:%d\n", win, lose);
+            win = lose = 0;
+        }
+    }
+    printf("%d:%d\n", win, lose);
 
-	return 0;
+    return 0;
 }

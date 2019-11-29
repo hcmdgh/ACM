@@ -1,30 +1,30 @@
 #include <iostream>
-#include <vector>
-#include <string>
 using namespace std;
 
-int main() {
-	ios::sync_with_stdio(false);
-	int n, m;
-	cin >> n >> m;
-	// false:朝向圈内，向左下标减
-	// true:朝向圈外，向左下标增
-	vector<pair<bool, string>> people(n);
-	for (int i = 0; i < n; ++i) {
-		cin >> people[i].first >> people[i].second;
-	}
-	int index = 0;
-	for (int i = 0; i < m; ++i) {
-		int direction, count;
-		cin >> direction >> count;
-		int step = ((people[index].first + direction) % 2 * 2 - 1) * (count % n);
-		index += step;
-		if (index >= n)
-			index -= n;
-		else if (index < 0)
-			index += n;
-	}
-	cout << people[index].second << endl;
+int N, M;
+struct Person {
+    char name[15];
+    int face;
+} persons[100005];
 
-	return 0;
+int main() {
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
+    while (scanf("%d%d", &N, &M) == 2) {
+        for (int i = 0; i < N; ++i) {
+            scanf("%d%s", &persons[i].face, persons[i].name);
+        }
+        int pos = 0;
+        while (M--) {
+            int direction, cnt;
+            scanf("%d%d", &direction, &cnt);
+            if (direction == persons[pos].face)
+                cnt = -cnt;
+            pos = (pos + cnt + N) % N;
+        }
+        printf("%s\n", persons[pos].name);
+    }
+
+    return 0;
 }

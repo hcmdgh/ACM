@@ -4,10 +4,13 @@ using namespace std;
 
 int N, S, A, B;
 int power[5005];
-int cnt = 0;
 
 int main() {
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
     scanf("%d%d%d%d", &N, &S, &A, &B);
+    int cnt = 0;
     while (N--) {
         int height, _power;
         scanf("%d%d", &height, &_power);
@@ -15,14 +18,12 @@ int main() {
             power[cnt++] = _power;
         }
     }
-    if (cnt == 0) {
-        printf("0\n");
-        return 0;
-    }
     sort(power, power + cnt);
     int ans = 0;
-    while (S - power[ans] >= 0) {
-        S -= power[ans];
+    for (int i = 0; i < cnt; ++i) {
+        if (S < power[i])
+            break;
+        S -= power[i];
         ++ans;
     }
     printf("%d\n", ans);

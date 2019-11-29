@@ -1,72 +1,55 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
-#include <climits>
 using namespace std;
 
-bool is_optimum(const vector<int>& volumes, int expected_price, int cost, int max_price, int allowance) {
-	bool valid = true;
-	for (int price = cost; price <= max_price; ++price) {
-		if ((expected_price - cost + allowance) * volumes[expected_price]
-			< (price - cost + allowance) * volumes[price]) {
-			valid = false;
-			break;
-		}
-	}
-	return valid;
-}
+typedef long long ll;
+int price2num[200005];
 
 int main() {
-	vector<int> volumes(100000);
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
+    int expected_price, cb, num_cb;
+    scanf("%d%d%d", &expected_price, &cb, &num_cb);
+    price2num[cb] = num_cb;
+    int last_price = cb;
+    int price, num;
+    while (scanf("%d%d", &price, &num) == 2 && (price != -1 || num != -1)) {
+        price2num[price] = num;
+        if (price - last_price > 1) {
+            int gap = (num - price2num[last_price]) / (price - last_price);
+            for (int i = last_price + 1; i < price; ++i) {
+                price2num[i] = price2num[i - 1] + gap;
+            }
+        }
+        last_price = price;
+    }
+    int reduce;
+    scanf("%d", &reduce);
+    int max_price = last_price;
+    while (price2num[max_price] > 0) {
+        ++max_price;
+        price2num[max_price] = price2num[max_price - 1] - reduce;
+    }
+    --max_price;
+    int subsidy = 0;
+    bool flag = false;
+    while (true) {
+        ll max_profit = 0;
+        ll expected_profit = (expected_price - cb + subsidy) * price2num[expected_price];
+        for (int i = cb; i <= max_price; ++i) {
+            ll profit = ll(i - cb + subsidy) * price2num[i];
+            max_profit = max(max_profit, profit);
+        }
+        if (max_profit == expected_profit) {
+            printf("%d\n", subsidy);
+            return 0;
+        }
+        if (flag)
+            subsidy = -subsidy;
+        else
+            subsidy = (-subsidy) + 1;
+        flag = !flag;
+    }
 
-	int expected_price;
-	cin >> expected_price;
-
-	int _price, _volume;
-	int cost = -1;
-	int _last_price = -1;
-	int max_price;
-	while (true) {
-		cin >> _price >> _volume;
-		if (_price == -1 && _volume == -1) {
-			int gap;
-			cin >> gap;
-			max_price = _last_price;
-			_volume = volumes[_last_price] - gap;
-			while (_volume > 0) {
-				volumes[max_price + 1] = _volume;
-				++max_price;
-				_volume -= gap;
-			}
-			break;
-		}
-		if (cost == -1)
-			cost = _price;
-		volumes[_price] = _volume;
-		if (_last_price != -1 && _price - _last_price > 1) {
-			int gap = (_volume - volumes[_last_price]) / (_price - _last_price);
-			for (int i = _last_price + 1; i < _price; ++i) {
-				volumes[i] = volumes[i - 1] + gap;
-			}
-		}
-		_last_price = _price;
-	}
-
-	int min_allowance = INT_MAX;
-	for (int i = 0; i < 10000; ++i) {
-		if (is_optimum(volumes, expected_price, cost, max_price, i)) {
-			if (i < abs(min_allowance))
-				min_allowance = i;
-		}
-		if (i != 0 && is_optimum(volumes, expected_price, cost, max_price, -i)) {
-			if (i < abs(min_allowance))
-				min_allowance = -i;
-		}
-	}
-	if (min_allowance != INT_MAX)
-		cout << min_allowance << endl;
-	else
-		cout << "NO SOLUTION" << endl;
-
-	return 0;
+    return 0;
 }

@@ -1,43 +1,42 @@
 #include <iostream>
-#include <cmath>
-#include <vector>
 using namespace std;
 
-int main() {
-	ios::sync_with_stdio(false);
-	int n;
-	cin >> n;
-	vector<int> coefficients(n + 1);
-	for (int i = 0; i < n + 1; ++i)
-		cin >> coefficients[i];
-	bool first = true;
-	for (int i = 0; i < n + 1; ++i) {
-		int coefficient = coefficients[i];
-		int power = n - i;
-		if (coefficient != 0) {
-			if (coefficient >= 1 && !first)
-				cout << "+";
-			else if (coefficient <= -1)
-				cout << "-";
-			coefficient = abs(coefficient);
-			if (coefficient == 1) {
-				if (power == 0)
-					cout << "1";
-				else if (power == 1)
-					cout << "x";
-				else
-					cout << "x^" << power;
-			} else {
-				if (power == 0)
-					cout << coefficient;
-				else if (power == 1)
-					cout << coefficient << "x";
-				else
-					cout << coefficient << "x^" << power;
-			}
-			first = false;
-		}
-	}
+int N;
+int arr[105];
 
-	return 0;
+int main() {
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
+    scanf("%d", &N);
+    for (int i = N; i >= 0; --i) {
+        scanf("%d", arr + i);
+    }
+    for (int i = N; i >= 0; --i) {
+        if (arr[i]) {
+            if (arr[i] == 1) {
+                if (i < N)
+                    putchar('+');
+            } else if (arr[i] == -1) {
+                putchar('-');
+            } else if (arr[i] > 0) {
+                if (i < N)
+                    putchar('+');
+                printf("%d", arr[i]);
+            } else {
+                printf("%d", arr[i]);
+            }
+
+            if (i > 0) {
+                putchar('x');
+                if (i > 1) {
+                    printf("^%d", i);
+                }
+            } else if (abs(arr[i]) == 1) {
+                putchar('1');
+            }
+        }
+    }
+
+    return 0;
 }

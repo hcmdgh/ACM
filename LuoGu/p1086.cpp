@@ -1,58 +1,54 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 using namespace std;
 
-struct Point {
-	int num;
-	int i, j;
+int M, N, K;
+struct Grid {
+    int x, y, peanut;
 
-	Point(int num, int i, int j) : num(num), i(i), j(j) {}
-
-	bool operator<(const Point& other) {
-		return num < other.num;
-	}
-};
+    bool operator<(const Grid& other) const {
+        return peanut > other.peanut;
+    }
+} grids[405];
+int grids_cnt;
 
 int main() {
-	int row, column, time_limit;
-	cin >> row >> column >> time_limit;
-	int temp;
-	vector<Point> points;
-	for (int i = 1; i <= row; ++i) {
-		for (int j = 1; j <= column; ++j) {
-			cin >> temp;
-			if (temp > 0)
-				points.emplace_back(Point(temp, i, j));
-		}
-	}
-	sort(points.rbegin(), points.rend());
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
+    while (scanf("%d%d%d", &M, &N, &K) == 3) {
+        grids_cnt = 0;
+        for (int i = 1; i <= M; ++i) {
+            for (int j = 1; j <= N; ++j) {
+                int num;
+                scanf("%d", &num);
+                if (num > 0) {
+                    grids[grids_cnt].x = i;
+                    grids[grids_cnt].y = j;
+                    grids[grids_cnt].peanut = num;
+                    ++grids_cnt;
+                }
+            }
+        }
+        sort(grids, grids + grids_cnt);
+        int last_x = -1, last_y = -1;
+        int total = 0;
+        for (int i = 0; i < grids_cnt; ++i) {
+            int x = grids[i].x, y = grids[i].y, peanut = grids[i].peanut;
+            int cost;
+            if (last_x == -1) {
+                cost = x;
+            } else {
+                cost = abs(x - last_x) + abs(y - last_y);
+            }
+            K -= cost + 1;
+            if (K < x)
+                break;
+            total += peanut;
+            last_x = x, last_y = y;
+        }
+        printf("%d\n", total);
+    }
 
-	// 第一棵花生树采摘完的现状
-	int current_count = points[0].num;
-	int last_count = 0;
-	int i = points[0].i, j = points[0].j;
-	int remaining_time = time_limit - i - 1;
-	auto iter = points.begin();
-
-	while (true) {
-		if (remaining_time < i) {
-			cout << last_count << endl;
-			break;
-		}
-		++iter;
-		if (iter == points.end()) {
-			cout << current_count << endl;
-			break;
-		}
-		last_count = current_count;
-		int delta_i = abs(i - iter->i);
-		int delta_j = abs(j - iter->j);
-		remaining_time -= delta_i + delta_j + 1;
-		i = iter->i;
-		j = iter->j;
-		current_count += iter->num;
-	}
-
-	return 0;
+    return 0;
 }
