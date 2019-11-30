@@ -1,63 +1,59 @@
 #include <iostream>
 #include <cstring>
-#include <climits>
 using namespace std;
 
 int N, M;
+char graph[1505][1505];
+int visited[1505][1505][3];
 const int DIRECTIONS_X[4] = {0, 0, 1, -1};
 const int DIRECTIONS_Y[4] = {1, -1, 0, 0};
-struct Point {
-    bool blocked;
-    int last_x, last_y;
-} graph[1505][1505];
 
-int readChar() {
+char readChar() {
     char ch;
-    while (true) {
+    do {
         ch = getchar();
-        if (ch == '.')
-            return 0;
-        if (ch == '#')
-            return 1;
-        if (ch == 'S')
-            return -1;
-    }
+    } while (ch != '#' && ch != '.' && ch != 'S');
+    return ch;
 }
 
 bool dfs(int x, int y) {
-    int _x = (x % N + N) % N, _y = (y % M + M) % M;
-    Point& p = graph[_x][_y];
-    if (p.blocked || (p.last_x == x && p.last_y == y)) {
+    int pro_x = (x % N + N) % N;
+    int pro_y = (y % M + M) % M;
+    if (graph[pro_x][pro_y] == '#') {
         return false;
-    } else if (p.last_x < INT_MAX && p.last_y < INT_MAX) {
+    } else if (visited[pro_x][pro_y][0] && visited[pro_x][pro_y][1] == x && visited[pro_x][pro_y][2] == y) {
+        return false;
+    } else if (visited[pro_x][pro_y][0]) {
         return true;
-    } else {
-        p.last_x = x, p.last_y = y;
-        bool res = false;
-        for (int d = 0; d < 4; ++d) {
-            res = res || dfs(x + DIRECTIONS_X[d], y + DIRECTIONS_Y[d]);
-        }
-        return res;
     }
+    visited[pro_x][pro_y][0] = true;
+    visited[pro_x][pro_y][1] = x;
+    visited[pro_x][pro_y][2] = y;
+    for (int d = 0; d < 4; ++d) {
+        int next_x = x + DIRECTIONS_X[d];
+        int next_y = y + DIRECTIONS_Y[d];
+        if (dfs(next_x, next_y))
+            return true;
+    }
+    return false;
 }
 
 int main() {
-    #ifdef DEBUG
+#ifdef DEBUG
     freopen("in.txt", "r", stdin);
-    freopen("out.txt", "w", stdout);
-    #endif // DEBUG
+#endif
     while (scanf("%d%d", &N, &M) == 2) {
-        int srcX, srcY;
+        int src_x = -1, src_y = -1;
         for (int i = 0; i < N; ++i) {
             for (int j = 0; j < M; ++j) {
-                int temp = readChar();
-                graph[i][j].blocked = temp > 0;
-                graph[i][j].last_x = graph[i][j].last_y = INT_MAX;
-                if (temp == -1)
-                    srcX = i, srcY = j;
+                char ch = readChar();
+                graph[i][j] = ch;
+                if (ch == 'S')
+                    src_x = i, src_y = j;
             }
         }
-        if (dfs(srcX, srcY)) {
+        memset(visited, 0, sizeof(visited));
+        if (dfs(src_x, src_y)) {
             printf("Yes\n");
         } else {
             printf("No\n");

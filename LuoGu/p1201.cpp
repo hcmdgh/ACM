@@ -1,41 +1,50 @@
 #include <iostream>
-#include <string>
 #include <map>
+#include <cstring>
 using namespace std;
 
 int N;
-string id2name[10];
-map<string, int> name2id;
-int sent_money[10];
-int received_money[10];
+char names[15][20];
+int sent[15], received[15];
+
+struct CMP {
+    bool operator()(const char* name1, const char* name2) {
+        return strcmp(name1, name2) < 0;
+    }
+};
+
+map<char*, int, CMP> name2idx;
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin >> N;
-    string name;
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
+    scanf("%d", &N);
     for (int i = 0; i < N; ++i) {
-        cin >> name;
-        id2name[i] = name;
-        name2id[name] = i;
+        scanf("%s", names[i]);
+        name2idx[names[i]] = i;
     }
-    while ((cin >> name)) {
-        int _money, count;
-        cin >> _money >> count;
-        if (count == 0) {
-            continue;
-        }
-        _money = _money / count * count;
-        sent_money[name2id[name]] = _money;
-        string _name;
-        for (int i = 0; i < count; ++i) {
-            cin >> _name;
-            received_money[name2id[_name]] += _money / count;
+//    for (auto item : name2idx) {
+//        printf("%s,%d\n", item.first, item.second);
+//    }
+    char name[20];
+    int num, money;
+    while (scanf("%s%d%d", name, &money, &num) == 3) {
+        int idx = name2idx[name];
+        if (num == 0) {
+            sent[idx] = 0;
+        } else {
+            int per = money / num;
+            sent[idx] = per * num;
+            for (int i = 0; i < num; ++i) {
+                char _name[20];
+                scanf("%s", _name);
+                received[name2idx[_name]] += per;
+            }
         }
     }
-
     for (int i = 0; i < N; ++i) {
-        cout << id2name[i] << ' ';
-        cout << received_money[i] - sent_money[i] << endl;
+        printf("%s %d\n", names[i], received[i] - sent[i]);
     }
 
     return 0;
