@@ -1,52 +1,59 @@
-#include <cstdio>
+#include <iostream>
 #include <algorithm>
 #include <cmath>
 using namespace std;
 
-const double PI = 3.141592654;
-#define SQUARE(_x) ((_x)*(_x))
-#define DISTANCE(_haha1, _hehe1, _haha2, _hehe2) (sqrt(SQUARE(_haha1-_haha2) + SQUARE(_hehe1-_hehe2)))
+#define MIN(a, b, c, d) (min(a, min(b, min(c, d))))
+#define SQUARE(x) ((x) * (x))
+#define DISTANCE(x1, y1, x2, y2) (sqrt(SQUARE((x1)-(x2))+SQUARE((y1)-(y2))))
 
-int N, haha1, haha2, hehe1, hehe2;  // 对应x1,x2,y1,y2，坑爹的洛谷
-typedef pair<int, int> Point;
-Point points[10];
-int orders[10];
-double radiuses[10];
+int N;
+int X1, Y1, X2, Y2;
+struct Point {
+    int x, y;
+    double radius;
+} points[10];
+int order[10];
+const double PI = acos(-1);
 
 int main() {
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
     scanf("%d", &N);
-    scanf("%d%d%d%d", &haha1, &hehe1, &haha2, &hehe2);
+    scanf("%d%d%d%d", &X1, &Y1, &X2, &Y2);
     for (int i = 0; i < N; ++i) {
-        scanf("%d%d", &points[i].first, &points[i].second);
+        scanf("%d%d", &points[i].x, &points[i].y);
+        order[i] = i;
     }
-
-    for (int i = 0; i < N; ++i) {
-        orders[i] = i;
-    }
-    double min_area = 1e9;
+    double ans = 0;
     do {
+        double square = 0;
         for (int i = 0; i < N; ++i) {
-            int idx = orders[i];
-            Point& point = points[idx];
-            int x = point.first;
-            int y = point.second;
-            double radius = min(min(abs(haha1-x), abs(haha2-x)), min(abs(hehe1-y), abs(hehe2-y)));
+            int x = points[order[i]].x;
+            int y = points[order[i]].y;
+            double min_radius = MIN(
+                    abs(X1 - x),
+                    abs(X2 - x),
+                    abs(Y1 - y),
+                    abs(Y2 - y)
+            );
             for (int j = 0; j < i; ++j) {
-                int _idx = orders[j];
-                Point& _point = points[_idx];
-                double dis = DISTANCE(x, y, _point.first, _point.second);
-                radius = min(radius, max(dis - radiuses[_idx], 0.0));
+                double dis = DISTANCE(x, y, points[order[j]].x, points[order[j]].y);
+                double radius = points[order[j]].radius;
+                if (dis <= radius) {
+                    min_radius = 0;
+                    break;
+                }
+                min_radius = min(min_radius, dis - radius);
             }
-            radiuses[idx] = radius;
+            points[order[i]].radius = min_radius;
+            square += PI * SQUARE(min_radius);
         }
-        double area = abs((haha1-haha2) * (hehe1-hehe2));
-        for (int i = 0; i < N; ++i) {
-            area -= PI * SQUARE(radiuses[i]);
-        }
-        min_area = min(min_area, area);
-    } while (next_permutation(orders, orders + N));
-    int ans = min_area + 0.5;
-    printf("%d\n", ans);
+        ans = max(ans, square);
+    } while (next_permutation(order, order + N));
+    int _ans = round(abs(X1 - X2) * abs(Y1 - Y2) - ans);
+    printf("%d\n", _ans);
 
     return 0;
 }
