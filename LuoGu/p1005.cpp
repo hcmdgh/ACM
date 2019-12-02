@@ -1,37 +1,50 @@
-#include <cstdio>
 #include <iostream>
 using namespace std;
 
-typedef long long ll;
+typedef __int128 ll;
 int N, M;
-ll arr[35][35];
-ll dp[35][35];
+ll arr[85][85];
+ll dp[85][85];
+int digits[100];
 
 int main() {
+#ifdef DEBUG
+    freopen("in.txt", "r", stdin);
+#endif
     scanf("%d%d", &N, &M);
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < M; ++j) {
-            scanf("%lld", &arr[i][j]);
-        }
-    }
-
     ll ans = 0;
-    for (int i = 0; i < N; ++i) {
-        dp[0][M-1] = 0;
-        for (int len = M - 1; len >= 0; --len) {
-            for (int j = 0; j < M - len + 1; ++j) {
-                int _i = j, _j = j + len - 1;
-                dp[_i][_j] = max(dp[_i-1][_j] + arr[i][_i-1]*(1<<(M-_j+_i-1)),
-                                 dp[_i][_j+1] + arr[i][_j+1]*(1<<(M-_j+_i-1)));
+    for (int i = 1; i <= N; ++i) {
+        for (int j = 1; j <= M; ++j) {
+            scanf("%d", &arr[i][j]);
+        }
+
+        for (int j = 1; j <= M; ++j) {
+            dp[j][1] = arr[i][j] << M;
+        }
+        for (int len = 2; len <= M; ++len) {
+            for (int j = 1; j <= M - len + 1; ++j) {
+                int round = M - len + 1;
+                dp[j][len] = max(
+                        (arr[i][j] << round) + dp[j + 1][len - 1],
+                        (arr[i][j + len - 1] << round) + dp[j][len - 1]
+                );
             }
         }
-        ll _ans = 0;
-        for (int j = 0; j < M; ++j) {
-            _ans = max(_ans, dp[j][j] + arr[i][j] * (1 << M));
-        }
-        ans += _ans;
+        ans += dp[1][M];
     }
-    printf("%lld\n", ans);
+    int cnt = 0;
+    while (ans > 0) {
+        digits[cnt++] = ans % 10;
+        ans /= 10;
+    }
+    if (cnt) {
+        while (--cnt >= 0) {
+            putchar('0' + digits[cnt]);
+        }
+        putchar('\n');
+    } else {
+        printf("0\n");
+    }
 
     return 0;
 }
